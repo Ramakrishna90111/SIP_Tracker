@@ -1,0 +1,160 @@
+create table investor(
+	investor_id varchar(10) primary key,
+	first_name varchar,
+	last_name varchar,
+	email varchar,
+	phone varchar,
+	date_of_birth date,
+	pan_no varchar(10),
+	address varchar
+);
+
+INSERT INTO investor (
+	investor_id,
+	first_name,
+	last_name,
+	email,
+	phone,
+	date_of_birth,
+	pan_no,
+	address
+) VALUES
+('INV001','Rahul','Sharma','rahul@gmail.com','9876543210','1990-05-12','ABCDE1234F','Mumbai'),
+('INV002','Priya','Reddy','priya@gmail.com','9123456780','1988-09-23','FGHIJ5678K','Hyderabad'),
+('INV003','Amit','Verma','amit@gmail.com','9988776655','1992-11-30','LMNOP9012L','Delhi'),
+('INV004','Sneha','Iyer','sneha@gmail.com','9090909090','1995-02-14','QRSTU3456M','Chennai'),
+('INV005','Vikram','Singh','vikram@gmail.com','8888888888','1985-07-08','VWXYZ7890N','Bangalore');
+
+
+
+create table portfolio(
+	portfolio_id int primary key,
+	investor_id varchar(10),
+	portfolio_name varchar,
+	total_invested float,
+	current_value float,
+	net_profit_loss float,
+	created_date date,
+	foreign key(investor_id)
+	references investor(investor_id)
+	on delete cascade
+);
+
+INSERT INTO portfolio (
+	portfolio_id,
+	investor_id,
+	portfolio_name,
+	total_invested,
+	current_value,
+	net_profit_loss,
+	created_date
+) VALUES
+(1,'INV001','Retirement Portfolio',100000,120000,20000,'2025-01-01'),
+(2,'INV002','Growth Portfolio',150000,170000,20000,'2025-01-10'),
+(3,'INV003','Wealth Portfolio',90000,95000,5000,'2025-01-15'),
+(4,'INV004','Future Savings',200000,240000,40000,'2025-01-20'),
+(5,'INV005','Long Term Portfolio',300000,360000,60000,'2025-01-25');
+
+
+
+create table mutual_fund(
+	fund_id varchar(10) primary key,
+	fund_name varchar,
+	amc_name varchar,
+	fund_type varchar,
+	category varchar,
+	nav_value float,
+	nav_date date,
+	risk_level varchar
+);
+
+INSERT INTO mutual_fund (
+	fund_id,
+	fund_name,
+	amc_name,
+	fund_type,
+	category,
+	nav_value,
+	nav_date,
+	risk_level
+) VALUES
+('FND001','SBI Bluechip Fund','SBI Mutual Fund','Equity','Large Cap',55.67,'2026-05-01','High'),
+('FND002','HDFC Midcap Fund','HDFC Mutual Fund','Equity','Mid Cap',72.45,'2026-05-01','High'),
+('FND003','ICICI Debt Fund','ICICI Prudential','Debt','Corporate Bond',34.89,'2026-05-01','Low'),
+('FND004','Axis Small Cap Fund','Axis Mutual Fund','Equity','Small Cap',98.12,'2026-05-01','Very High'),
+('FND005','Kotak Hybrid Fund','Kotak Mutual Fund','Hybrid','Balanced',45.76,'2026-05-01','Medium');
+
+
+
+create table sip_registration(
+	sip_id varchar(10) primary key,
+	investor_id varchar(10),
+	fund_id varchar(10),
+	sip_amount float,
+	sip_date int,
+	frequency varchar,
+	start_date date,
+	sip_status varchar,
+	foreign key(investor_id)
+	references investor(investor_id)
+	on delete cascade,
+	foreign key(fund_id)
+	references mutual_fund(fund_id)
+	on delete cascade
+);
+
+INSERT INTO sip_registration (
+	sip_id,
+	investor_id,
+	fund_id,
+	sip_amount,
+	sip_date,
+	frequency,
+	start_date,
+	sip_status
+) VALUES
+('SIP001','INV001','FND001',5000,5,'Monthly','2025-01-01','Active'),
+('SIP002','INV002','FND002',7000,10,'Monthly','2025-02-01','Active'),
+('SIP003','INV003','FND003',4000,15,'Monthly','2025-03-01','Active'),
+('SIP004','INV004','FND004',8000,20,'Monthly','2025-04-01','Paused'),
+('SIP005','INV005','FND005',10000,25,'Monthly','2025-05-01','Active');
+
+
+
+create table investment_transaction(
+	transaction_id varchar(10) primary key,
+	sip_id varchar(10),
+	investor_id varchar(10),
+	fund_id varchar(10),
+	transaction_amount float,
+	nav_used float,
+	units_allocated float,
+	transaction_date date,
+	transaction_status varchar,
+	foreign key(sip_id)
+	references sip_registration(sip_id)
+	on delete cascade,
+	foreign key(investor_id)
+	references investor(investor_id)
+	on delete cascade,
+	foreign key(fund_id)
+	references mutual_fund(fund_id)
+	on delete cascade
+);
+
+INSERT INTO investment_transaction (
+	transaction_id,
+	sip_id,
+	investor_id,
+	fund_id,
+	transaction_amount,
+	nav_used,
+	units_allocated,
+	transaction_date,
+	transaction_status
+) VALUES
+('TXN001','SIP001','INV001','FND001',5000,55.67,89.81,'2026-05-05','Success'),
+('TXN002','SIP002','INV002','FND002',7000,72.45,96.61,'2026-05-10','Success'),
+('TXN003','SIP003','INV003','FND003',4000,34.89,114.64,'2026-05-15','Success'),
+('TXN004','SIP004','INV004','FND004',8000,98.12,81.53,'2026-05-20','Failed'),
+('TXN005','SIP005','INV005','FND005',10000,45.76,218.53,'2026-05-25','Success');
